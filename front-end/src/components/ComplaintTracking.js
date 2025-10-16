@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 const ComplaintTracking = () => {
   const [trackingId, setTrackingId] = useState("");
@@ -9,16 +9,22 @@ const ComplaintTracking = () => {
 
   const handleTrackComplaint = async (e) => {
     e.preventDefault();
-    if (!trackingId.trim()) {
+
+    const trimmedId = trackingId.trim();
+    if (!trimmedId) {
       setError("Please enter a complaint ID");
       return;
     }
 
     setLoading(true);
     setError("");
-    
+    setComplaint(null);
+    setTimeline([]);
+
     try {
-      const response = await fetch(`http://localhost:5000/track-complaint/${trackingId}`);
+      const response = await fetch(
+        `http://localhost:5000/track-complaint/${trimmedId}`
+      );
       const data = await response.json();
 
       if (response.ok) {
@@ -26,60 +32,52 @@ const ComplaintTracking = () => {
         setTimeline(data.timeline || []);
       } else {
         setError(data.message || "Complaint not found");
-        setComplaint(null);
-        setTimeline([]);
       }
     } catch (err) {
-      setError("Failed to fetch complaint details");
-      setComplaint(null);
-      setTimeline([]);
+      console.error("Tracking error:", err);
+      setError("Failed to fetch complaint details. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "New":
-        return "#3182ce";
-      case "Under Review":
-        return "#d69e2e";
-      case "In Progress":
-        return "#38a169";
-      case "Resolved":
-        return "#00897b";
-      case "Closed":
-        return "#718096";
-      case "Escalated":
-        return "#e53e3e";
-      default:
-        return "#718096";
-    }
+    const colors = {
+      New: "#3182ce",
+      "Under Review": "#d69e2e",
+      "In Progress": "#38a169",
+      Resolved: "#00897b",
+      Closed: "#718096",
+      Escalated: "#e53e3e",
+    };
+    return colors[status] || "#718096";
   };
 
   const getPriorityColor = (urgency) => {
-    switch (urgency) {
-      case "critical":
-        return "#e53e3e";
-      case "high":
-        return "#dd6b20";
-      case "medium":
-        return "#d69e2e";
-      case "low":
-        return "#38a169";
-      default:
-        return "#718096";
-    }
+    const colors = {
+      critical: "#e53e3e",
+      high: "#dd6b20",
+      medium: "#d69e2e",
+      low: "#38a169",
+    };
+    return colors[urgency] || "#718096";
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    if (!dateString) return "N/A";
+
+    try {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return dateString;
+    }
   };
 
   return (
@@ -100,9 +98,10 @@ const ComplaintTracking = () => {
               id="trackingId"
               value={trackingId}
               onChange={(e) => setTrackingId(e.target.value)}
-              placeholder="Enter your complaint ID (e.g., COMP1234567890)"
+              placeholder="Enter your complaint ID"
               className="form-input"
               required
+              disabled={loading}
             />
             <button type="submit" className="track-btn" disabled={loading}>
               {loading ? "Tracking..." : "Track"}
@@ -127,7 +126,9 @@ const ComplaintTracking = () => {
                 </span>
                 <span
                   className="priority-badge"
-                  style={{ backgroundColor: getPriorityColor(complaint.urgency) }}
+                  style={{
+                    backgroundColor: getPriorityColor(complaint.urgency),
+                  }}
                 >
                   {complaint.urgency.toUpperCase()}
                 </span>
@@ -141,7 +142,9 @@ const ComplaintTracking = () => {
               </div>
               <div className="info-row">
                 <span className="info-label">Submitted:</span>
-                <span className="info-value">{formatDate(complaint.created_at)}</span>
+                <span className="info-value">
+                  {formatDate(complaint.created_at)}
+                </span>
               </div>
               <div className="info-row">
                 <span className="info-label">Type:</span>
@@ -186,7 +189,9 @@ const ComplaintTracking = () => {
                         </span>
                       </div>
                       {update.update_message && (
-                        <p className="timeline-message">{update.update_message}</p>
+                        <p className="timeline-message">
+                          {update.update_message}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -235,7 +240,7 @@ const ComplaintTracking = () => {
           white-space: nowrap;
         }
 
-        .track-btn:hover {
+        .track-btn:hover:not(:disabled) {
           background: #00796b;
         }
 
@@ -352,7 +357,7 @@ const ComplaintTracking = () => {
         }
 
         .timeline::before {
-          content: '';
+          content: "";
           position: absolute;
           left: 15px;
           top: 0;

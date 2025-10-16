@@ -10,7 +10,7 @@ const Home = () => {
         </h2>
 
         <div className="inner-container">
-          <p>If you don’t have an account click below!</p>
+          <p>If you don't have an account click below!</p>
           <Link to="/signup">
             <button>Go to Signup Page</button>
           </Link>

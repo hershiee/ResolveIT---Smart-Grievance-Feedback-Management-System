@@ -14,6 +14,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
   const [message, setMessage] = useState(null);
   const [status, setStatus] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
     "Academic Issues",
@@ -34,27 +35,50 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles(files);
+
+    // Validate file sizes (max 5MB each)
+    const validFiles = files.filter((file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`File ${file.name} exceeds 5MB limit`);
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedFiles(validFiles);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) return; // Prevent double submission
+
+    setIsSubmitting(true);
 
     try {
       const submitData = new FormData();
 
       // Add user ID if logged in and submission is public
       if (formData.submissionType === "public") {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user && user.id) {
-          submitData.append("userId", user.id);
+        const userString = localStorage.getItem("user");
+        if (userString) {
+          try {
+            const user = JSON.parse(userString);
+            if (user && user.id) {
+              submitData.append("userId", user.id);
+            }
+          } catch (parseError) {
+            console.error("Error parsing user data:", parseError);
+          }
         }
       }
 
+      // Append all form fields
       Object.keys(formData).forEach((key) => {
         submitData.append(key, formData[key]);
       });
 
+      // Append files
       selectedFiles.forEach((file) => {
         submitData.append("files", file);
       });
@@ -101,8 +125,11 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
         setMessage(data.message || "Failed to submit complaint");
       }
     } catch (err) {
+      console.error("Submission error:", err);
       setStatus("error");
       setMessage("Server error. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,6 +158,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
                 value="public"
                 checked={formData.submissionType === "public"}
                 onChange={handleChange}
+                disabled={isSubmitting}
               />
               <span className="radio-text">Public (Trackable)</span>
             </label>
@@ -141,6 +169,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
                 value="anonymous"
                 checked={formData.submissionType === "anonymous"}
                 onChange={handleChange}
+                disabled={isSubmitting}
               />
               <span className="radio-text">Anonymous (Private)</span>
             </label>
@@ -159,6 +188,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
             onChange={handleChange}
             className="form-select"
             required
+            disabled={isSubmitting}
           >
             <option value="">Select a category</option>
             {categories.map((cat, index) => (
@@ -183,6 +213,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
             placeholder="Brief description of your issue"
             className="form-input"
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -200,6 +231,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
             className="form-textarea"
             rows="5"
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -214,6 +246,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
             value={formData.urgency}
             onChange={handleChange}
             className="form-select"
+            disabled={isSubmitting}
           >
             <option value="low">Low - Can wait for resolution</option>
             <option value="medium">Medium - Needs attention soon</option>
@@ -238,6 +271,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
               onChange={handleChange}
               placeholder="Email or phone number for updates (optional)"
               className="form-input"
+              disabled={isSubmitting}
             />
           </div>
         )}
@@ -254,6 +288,7 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
             accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
             onChange={handleFileChange}
             className="form-file-input"
+            disabled={isSubmitting}
           />
           <div className="file-upload-info">
             <small>
@@ -282,8 +317,8 @@ const ComplaintForm = ({ onComplaintSubmitted }) => {
 
         {/* Submit Button */}
         <div className="form-group">
-          <button type="submit" className="submit-btn">
-            Submit Complaint
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Complaint"}
           </button>
         </div>
       </form>
