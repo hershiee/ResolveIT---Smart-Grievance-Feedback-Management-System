@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 import Navbar from "./Navbar";
 
 const AdminDashboard = () => {
@@ -186,6 +198,35 @@ const AdminDashboard = () => {
       minute: "2-digit",
     });
   };
+
+  // Prepare chart data
+  const statusChartData = [
+    "New",
+    "Under Review",
+    "In Progress",
+    "Resolved",
+    "Escalated",
+  ].map((status) => ({
+    name: status,
+    count: complaints.filter((c) => c.status === status).length,
+  }));
+
+  const categoryChartData = Array.from(
+    new Set(complaints.map((c) => c.category))
+  ).map((category) => ({
+    name: category,
+    value: complaints.filter((c) => c.category === category).length,
+  }));
+
+  const statusColors = ["#3182ce", "#d69e2e", "#38a169", "#00897b", "#e53e3e"];
+  const categoryColors = [
+    "#3182ce",
+    "#38a169",
+    "#d69e2e",
+    "#e53e3e",
+    "#718096",
+    "#00897b",
+  ];
 
   if (loading) {
     return (
@@ -439,70 +480,55 @@ const AdminDashboard = () => {
         {activeTab === "analytics" && (
           <div className="analytics-content">
             <div className="analytics-grid">
+              {/* Status Distribution Chart */}
               <div className="analytics-card">
                 <h3>Status Distribution</h3>
-                <div className="chart-placeholder">
-                  <div className="status-chart">
-                    {[
-                      "New",
-                      "Under Review",
-                      "In Progress",
-                      "Resolved",
-                      "Escalated",
-                    ].map((status) => {
-                      const count = complaints.filter(
-                        (c) => c.status === status
-                      ).length;
-                      const percentage =
-                        complaints.length > 0
-                          ? ((count / complaints.length) * 100).toFixed(1)
-                          : 0;
-                      return (
-                        <div key={status} className="chart-bar">
-                          <div className="chart-label">{status}</div>
-                          <div className="chart-bar-container">
-                            <div
-                              className="chart-bar-fill"
-                              style={{
-                                width: `${percentage}%`,
-                                backgroundColor: getStatusColor(status),
-                              }}
-                            ></div>
-                          </div>
-                          <div className="chart-value">{count}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={statusChartData}
+                    margin={{ top: 20, right: 20, bottom: 20, left: 0 }}
+                  >
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" name="Complaints">
+                      {statusChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={statusColors[index]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
 
+              {/* Category Breakdown Chart */}
               <div className="analytics-card">
                 <h3>Category Breakdown</h3>
-                <div className="category-stats">
-                  {Array.from(new Set(complaints.map((c) => c.category))).map(
-                    (category) => {
-                      const count = complaints.filter(
-                        (c) => c.category === category
-                      ).length;
-                      const percentage =
-                        complaints.length > 0
-                          ? ((count / complaints.length) * 100).toFixed(1)
-                          : 0;
-                      return (
-                        <div key={category} className="category-item">
-                          <span className="category-name">{category}</span>
-                          <div className="category-stats-right">
-                            <span className="category-count">{count}</span>
-                            <span className="category-percentage">
-                              ({percentage}%)
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    }
-                  )}
-                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={categoryChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label
+                    >
+                      {categoryChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={categoryColors[index % categoryColors.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
