@@ -36,21 +36,26 @@ const Signup = () => {
       const res = await fetch("http://localhost:5000/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          role: "user",
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (data.success) {
         setStatus("success");
-        setMessage("User registered successfully!");
+        setMessage("Account created successfully! Redirecting to login...");
         setShowPopup(true);
+
+        // Clear form
+        setFormData({ name: "", email: "", password: "" });
+
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } else {
         setStatus("error");
-        setMessage(data.message || "Signup failed");
+        setMessage(data.message || "Signup failed. Please try again.");
       }
     } catch (err) {
       console.error("Signup error:", err);

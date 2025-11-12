@@ -28,8 +28,9 @@ const Login = () => {
 
       const data = await res.json();
 
-      if (res.ok) {
-        // Store user data in localStorage
+      if (data.success) {
+        // Store token AND user data
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Navigate based on user role
@@ -186,61 +187,53 @@ const Login = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+      <style>{`
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-        @keyframes shake {
-          0%,
-          100% {
-            transform: translateX(0);
-          }
-          10%,
-          30%,
-          50%,
-          70%,
-          90% {
-            transform: translateX(-4px);
-          }
-          20%,
-          40%,
-          60%,
-          80% {
-            transform: translateX(4px);
-          }
-        }
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+      transform: translateX(-4px);
+    }
+    20%, 40%, 60%, 80% {
+      transform: translateX(4px);
+    }
+  }
 
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out;
-        }
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+  }
 
-        .animate-slideUp {
-          animation: slideUp 0.6s ease-out 0.2s both;
-        }
+  .animate-slideUp {
+    animation: slideUp 0.6s ease-out 0.2s both;
+  }
 
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+`}</style>
     </div>
   );
 };

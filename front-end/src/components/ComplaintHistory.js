@@ -9,7 +9,7 @@ const ComplaintHistory = () => {
     status: "all",
     category: "all",
     urgency: "all",
-    dateRange: "all"
+    dateRange: "all",
   });
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +27,9 @@ const ComplaintHistory = () => {
   const fetchUserComplaints = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const response = await fetch(`http://localhost:5000/user-complaints/${user?.id || 0}`);
+      const response = await fetch(
+        `http://localhost:5000/user-complaints/${user?.id || 0}`
+      );
       const data = await response.json();
 
       if (response.ok) {
@@ -47,22 +49,23 @@ const ComplaintHistory = () => {
 
     // Filter by status
     if (filters.status !== "all") {
-      filtered = filtered.filter(complaint => 
-        complaint.status.toLowerCase() === filters.status.toLowerCase()
+      filtered = filtered.filter(
+        (complaint) =>
+          complaint.status.toLowerCase() === filters.status.toLowerCase()
       );
     }
 
     // Filter by category
     if (filters.category !== "all") {
-      filtered = filtered.filter(complaint => 
-        complaint.category === filters.category
+      filtered = filtered.filter(
+        (complaint) => complaint.category === filters.category
       );
     }
 
     // Filter by urgency
     if (filters.urgency !== "all") {
-      filtered = filtered.filter(complaint => 
-        complaint.urgency === filters.urgency
+      filtered = filtered.filter(
+        (complaint) => complaint.urgency === filters.urgency
       );
     }
 
@@ -70,7 +73,7 @@ const ComplaintHistory = () => {
     if (filters.dateRange !== "all") {
       const now = new Date();
       const filterDate = new Date();
-      
+
       switch (filters.dateRange) {
         case "week":
           filterDate.setDate(now.getDate() - 7);
@@ -84,10 +87,10 @@ const ComplaintHistory = () => {
         default:
           break;
       }
-      
+
       if (filters.dateRange !== "all") {
-        filtered = filtered.filter(complaint => 
-          new Date(complaint.created_at) >= filterDate
+        filtered = filtered.filter(
+          (complaint) => new Date(complaint.created_at) >= filterDate
         );
       }
     }
@@ -96,30 +99,30 @@ const ComplaintHistory = () => {
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [filterType]: value
+      [filterType]: value,
     }));
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      "New": "#3182ce",
+      New: "#3182ce",
       "Under Review": "#d69e2e",
       "In Progress": "#38a169",
-      "Resolved": "#00897b",
-      "Closed": "#718096",
-      "Escalated": "#e53e3e"
+      Resolved: "#00897b",
+      Closed: "#718096",
+      Escalated: "#e53e3e",
     };
     return colors[status] || "#718096";
   };
 
   const getPriorityColor = (urgency) => {
     const colors = {
-      "critical": "#e53e3e",
-      "high": "#dd6b20",
-      "medium": "#d69e2e",
-      "low": "#38a169"
+      critical: "#e53e3e",
+      high: "#dd6b20",
+      medium: "#d69e2e",
+      low: "#38a169",
     };
     return colors[urgency] || "#718096";
   };
@@ -128,7 +131,7 @@ const ComplaintHistory = () => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     });
   };
 
@@ -210,7 +213,14 @@ const ComplaintHistory = () => {
           </div>
 
           <button
-            onClick={() => setFilters({status: "all", category: "all", urgency: "all", dateRange: "all"})}
+            onClick={() =>
+              setFilters({
+                status: "all",
+                category: "all",
+                urgency: "all",
+                dateRange: "all",
+              })
+            }
             className="clear-filters-btn"
           >
             Clear Filters
@@ -237,13 +247,17 @@ const ComplaintHistory = () => {
                 <div className="card-badges">
                   <span
                     className="status-badge"
-                    style={{ backgroundColor: getStatusColor(complaint.status) }}
+                    style={{
+                      backgroundColor: getStatusColor(complaint.status),
+                    }}
                   >
                     {complaint.status}
                   </span>
                   <span
                     className="priority-badge"
-                    style={{ backgroundColor: getPriorityColor(complaint.urgency) }}
+                    style={{
+                      backgroundColor: getPriorityColor(complaint.urgency),
+                    }}
                   >
                     {complaint.urgency}
                   </span>
@@ -288,20 +302,28 @@ const ComplaintHistory = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{selectedComplaint.title}</h2>
-              <button onClick={closeModal} className="close-btn">&times;</button>
+              <button onClick={closeModal} className="close-btn">
+                &times;
+              </button>
             </div>
 
             <div className="modal-body">
               <div className="modal-badges">
                 <span
                   className="status-badge"
-                  style={{ backgroundColor: getStatusColor(selectedComplaint.status) }}
+                  style={{
+                    backgroundColor: getStatusColor(selectedComplaint.status),
+                  }}
                 >
                   {selectedComplaint.status}
                 </span>
                 <span
                   className="priority-badge"
-                  style={{ backgroundColor: getPriorityColor(selectedComplaint.urgency) }}
+                  style={{
+                    backgroundColor: getPriorityColor(
+                      selectedComplaint.urgency
+                    ),
+                  }}
                 >
                   {selectedComplaint.urgency}
                 </span>
@@ -312,7 +334,8 @@ const ComplaintHistory = () => {
                   <strong>Category:</strong> {selectedComplaint.category}
                 </div>
                 <div className="modal-info-item">
-                  <strong>Submitted:</strong> {formatDate(selectedComplaint.created_at)}
+                  <strong>Submitted:</strong>{" "}
+                  {formatDate(selectedComplaint.created_at)}
                 </div>
                 <div className="modal-info-item">
                   <strong>Complaint ID:</strong> {selectedComplaint.id}
@@ -366,15 +389,19 @@ const ComplaintHistory = () => {
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
         .filters-section {
           background: white;
           padding: 25px;
           border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
           margin-bottom: 30px;
         }
 
@@ -449,14 +476,14 @@ const ComplaintHistory = () => {
           background: white;
           border-radius: 12px;
           padding: 25px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
           border: 1px solid #e2e8f0;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .complaint-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -547,7 +574,7 @@ const ComplaintHistory = () => {
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0,0,0,0.5);
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
           justify-content: center;
           align-items: center;

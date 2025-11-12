@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { MessageSquare, LogIn, UserPlus, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [hoveredButton, setHoveredButton] = useState(null);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 flex items-center justify-center p-4">
@@ -27,9 +28,9 @@ const Home = () => {
             <MessageSquare className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 leading-tight">
-            ResolveIT
+            Online Complaint Portal
             <span className="block text-3xl md:text-4xl mt-2 bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-              Smart Grievance & Feedback Management System
+              & Feedback Management System
             </span>
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
@@ -75,22 +76,21 @@ const Home = () => {
                   </p>
                 </div>
 
-                <Link to="/signup" className="w-full">
-                  <button
-                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 group ${
-                      hoveredButton === "signup"
-                        ? "bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg scale-105"
-                        : "bg-white text-teal-600 border-2 border-teal-500 hover:bg-teal-50"
+                <button
+                  onClick={() => navigate("/signup")}
+                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 group ${
+                    hoveredButton === "signup"
+                      ? "bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg scale-105"
+                      : "bg-white text-teal-600 border-2 border-teal-500 hover:bg-teal-50"
+                  }`}
+                >
+                  Go to Signup Page
+                  <ChevronRight
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      hoveredButton === "signup" ? "translate-x-1" : ""
                     }`}
-                  >
-                    Go to Signup Page
-                    <ChevronRight
-                      className={`w-5 h-5 transition-transform duration-300 ${
-                        hoveredButton === "signup" ? "translate-x-1" : ""
-                      }`}
-                    />
-                  </button>
-                </Link>
+                  />
+                </button>
               </div>
             </div>
 
@@ -128,22 +128,21 @@ const Home = () => {
                   </p>
                 </div>
 
-                <Link to="/login" className="w-full">
-                  <button
-                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 group ${
-                      hoveredButton === "login"
-                        ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105"
-                        : "bg-white text-cyan-600 border-2 border-cyan-500 hover:bg-cyan-50"
+                <button
+                  onClick={() => navigate("/login")}
+                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 group ${
+                    hoveredButton === "login"
+                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105"
+                      : "bg-white text-cyan-600 border-2 border-cyan-500 hover:bg-cyan-50"
+                  }`}
+                >
+                  Go to Login Page
+                  <ChevronRight
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      hoveredButton === "login" ? "translate-x-1" : ""
                     }`}
-                  >
-                    Go to Login Page
-                    <ChevronRight
-                      className={`w-5 h-5 transition-transform duration-300 ${
-                        hoveredButton === "login" ? "translate-x-1" : ""
-                      }`}
-                    />
-                  </button>
-                </Link>
+                  />
+                </button>
               </div>
             </div>
           </div>
@@ -173,13 +172,28 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Admin Login Section */}
+        <div className="text-center mt-8">
+          <div className="inline-block bg-white rounded-2xl shadow-md px-6 py-4">
+            <p className="text-sm text-gray-600 mb-2">
+              Are you an administrator?
+            </p>
+            <Link
+              to="/login"
+              className="text-teal-600 font-semibold hover:text-teal-700 transition-colors duration-200"
+            >
+              Login as Admin →
+            </Link>
+          </div>
+        </div>
+
         {/* Footer */}
-        <div className="text-center mt-8 text-gray-600">
+        <div className="text-center mt-6 text-gray-600">
           <p className="text-sm">Need help? Contact our support team</p>
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
